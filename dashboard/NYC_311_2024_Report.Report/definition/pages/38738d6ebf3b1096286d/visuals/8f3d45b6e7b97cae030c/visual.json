@@ -1,0 +1,82 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "8f3d45b6e7b97cae030c",
+  "position": {
+    "x": 898.88888888888891,
+    "y": 498.88888888888886,
+    "z": 6001,
+    "height": 33.333333333333336,
+    "width": 190,
+    "tabOrder": 5001
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "● ≤ 10%",
+                    "textStyle": {
+                      "color": "#10b981"
+                    }
+                  },
+                  {
+                    "value": " "
+                  },
+                  {
+                    "value": "● 10–20%",
+                    "textStyle": {
+                      "color": "#f59e0b"
+                    }
+                  },
+                  {
+                    "value": " "
+                  },
+                  {
+                    "value": "● > 20%",
+                    "textStyle": {
+                      "color": "#ef4444"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

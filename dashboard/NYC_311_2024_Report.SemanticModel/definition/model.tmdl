@@ -1,0 +1,27 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Date","requests","BoroughSummary","AgencySummary"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Date
+ref table _Measures
+ref table DateTableTemplate_05366afa-ba08-4db6-bf0c-04e62d980d05
+ref table requests
+ref table LocalDateTable_f41e9ac8-df2e-4cd3-b56c-1a7b6da63976
+ref table BoroughSummary
+ref table AgencySummary
+
+ref role Manhattan_Only
+ref role UnrestrictedRole
+
+ref cultureInfo en-US
+

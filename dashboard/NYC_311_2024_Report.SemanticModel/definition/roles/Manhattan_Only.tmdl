@@ -1,0 +1,5 @@
+role Manhattan_Only
+	modelPermission: read
+
+	annotation PBI_Id = e69ec4d7fec641ce8e4e33dbc8225d3c
+

@@ -1,0 +1,658 @@
+table _Measures
+	lineageTag: d3c088d1-e022-457d-acb3-1159b27c7d88
+
+	measure 'Total Requests' = Countrows(requests)
+		formatString: #,0
+		lineageTag: db65033a-be90-4d29-9537-59661e8afe6d
+
+	measure 'Avg Resolution Days' =
+			
+			AVERAGEX(
+			    FILTER(
+			        Requests,
+			        Requests[resolution_days] <> BLANK()
+			    ),
+			    Requests[resolution_days]
+			)
+		formatString: 0.0
+		lineageTag: 4b6a1259-bee0-484d-857b-f1b25305ed85
+
+	measure 'SLA Breach Rate %' =
+			
+			DIVIDE([SLA Breaches], [Total Closed])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: eb846d88-fab7-4884-848c-da641edf3d0f
+
+	measure 'Total Requests (Display)' =
+			
+			VAR Num = [Total Requests]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ABS(Num) >= 1000000, FORMAT(Num/1000000, "0.00") & "M",
+			    ABS(Num) >= 1000, FORMAT(Num/1000, "0.00") & "K",
+			    FORMAT(Num, "0.00")
+			)
+		lineageTag: a3e2ef6c-e0f0-4584-97e5-7ac1f67fafd9
+
+	measure 'Avg Resolution Days (Display)' = FORMAT([Avg Resolution Days], "0.00") & " Days"
+		lineageTag: 91adc342-e2b7-4003-be4d-26d195585dae
+
+	measure 'Total Closed' =
+			
+			CALCULATE(
+			    COUNTROWS(requests),
+			    requests[status] = "Closed"
+			)
+		formatString: 0
+		lineageTag: 6176bc4a-2b5c-4358-bfeb-4d5c88dc68a4
+
+	measure 'Total Open' =
+			
+			CALCULATE(
+			    COUNTROWS(Requests),
+			    Requests[status] <> "Closed"
+			)
+		formatString: 0
+		lineageTag: d5ceac48-275d-433d-9ddb-9a780df00a94
+
+	measure 'Closure Rate %' =
+			
+			DIVIDE([Total Closed], [Total Requests])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 403cf0a2-174f-4ca3-8d43-cc0b99954094
+
+	measure 'SLA Breaches' =
+			
+			CALCULATE(
+			    COUNTROWS(Requests),
+			    Requests[is_sla_breach] = 1
+			)
+		formatString: 0
+		lineageTag: f26f4c36-fdfd-400f-a215-4ccb88424e75
+
+	measure 'SLA Breach Text - Color' =
+			
+			VAR _rate = [SLA Breach Rate %]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(_rate),  "#64748b",
+			        _rate >= 0.50,   "#ef4444",  -- Red  ≥20%
+			        _rate >= 0.10,   "#f59e0b",  -- Amber 10-20%
+			        "#10b981"                    -- Green <10%
+			    )
+		lineageTag: fbb8a965-4e36-4bc2-8bd2-63913c0a15b4
+
+	measure 'Requests YoY %' =
+			
+			VAR _curr = [Total Requests]
+			VAR _ly   = [Total Requests LY]
+			RETURN
+			    IF(
+			        NOT ISBLANK(_ly),
+			        DIVIDE(_curr - _ly, _ly),
+			        BLANK()
+			    )
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: c88e3a16-734f-43c7-a4f8-3ee959e6bc32
+
+	measure 'Requests MTD' =
+			
+			CALCULATE(
+			    [Total Requests],
+			    DATESMTD('Date'[full_date])
+			)
+		formatString: 0.00
+		lineageTag: 08016f7c-1829-40a8-a429-416d07b01b80
+
+	measure 'Requests YTD' =
+			
+			CALCULATE(
+			    [Total Requests],
+			    DATESYTD('Date'[full_date])
+			)
+		formatString: 0.00
+		lineageTag: c70b3538-87f3-4d84-aa2e-3f6eaf6de1af
+
+	measure 'Dynamic Title' =
+			
+			VAR _borough =
+			    IF(
+			        ISFILTERED(Requests[borough]),
+			        SELECTEDVALUE(Requests[borough], "Multiple Boroughs"),
+			        "All Boroughs"
+			    )
+			VAR _year =
+			    IF(
+			        ISFILTERED('Date'[year]),
+			        SELECTEDVALUE('Date'[year], "Multiple Years"),
+			        "All Years"
+			    )
+			RETURN "NYC 311 — " & _borough & " | " & _year
+		lineageTag: 61968344-b7bf-4366-a31e-87da4080ce72
+
+	measure 'KPI Color YoY' =
+			
+			VAR _pct = [Requests YoY %]
+			RETURN
+			    SWITCH(TRUE(),
+			        ISBLANK(_pct),  "#64748b",
+			        -- More requests = worse (311 = complaints)
+			        _pct >= 0,   "#ef4444",
+			        _pct < 0,  "#f59e0b",
+			        "#10b981"
+			    )
+		lineageTag: 3ec87ae0-6ff6-4213-a085-c9adeb2e72cc
+
+	measure 'Total Requests (vs Last Year - Color)' = ```
+			
+			VAR _curr = [Total Requests]
+			VAR _ly   = [Total Requests LY]
+			VAR _perc = DIVIDE(_curr - _ly,_ly)
+			VAR _format =
+			SWITCH(
+			    TRUE(), 
+			    _perc >0, "Green",
+			    _perc <0, "Red",
+			    "Grey"
+			)
+			Return _format
+			```
+		lineageTag: 1c1b076e-e23c-4633-9ee4-e31abbb39513
+
+	measure 'Closure Rate % (vs Last Year - Color)' = ```
+			
+			VAR _curr = [Closure Rate %]
+			VAR _ly   = [Closure Rate % - LY]
+			VAR _perc = DIVIDE(_curr - _ly,_ly)
+			VAR _format =
+			SWITCH(
+			    TRUE(), 
+			    _perc >0, "Green",
+			    _perc <0, "Red",
+			    "Grey"
+			)
+			Return _format
+			```
+		lineageTag: c13d4b3a-284b-43f2-975e-a5da0194506a
+
+	measure 'Closure Rate % (vs Last Year)' = ```
+			
+			VAR _curr = [Closure Rate %]
+			VAR _ly   = [Closure Rate % - LY]
+			VAR _perc = DIVIDE(_curr - _ly,_ly)
+			VAR _format =
+			SWITCH(
+			    TRUE(), 
+			    _perc >0, UNICHAR(11165) & " " & FORMAT(_perc,"0.0%"),
+			    _perc <0, UNICHAR(11167) & " " & FORMAT(_perc*-1,"0.0%"),
+			    FORMAT(_perc,"0.0%")
+			)
+			Return _format
+			```
+		lineageTag: 9b36dbf4-56e8-456b-a4f8-c907943b2f79
+
+	measure 'Closure Rate % - LY' =
+			
+			CALCULATE(
+			    DIVIDE([Total Closed], [Total Requests]),
+			    SAMEPERIODLASTYEAR('Date'[full_date])
+			)
+		lineageTag: 0e52fae4-ea24-4ec5-9329-3bc2db23ca75
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Resolution Days - LY' = ```
+			
+			CALCULATE(
+			    
+			AVERAGEX(
+			    FILTER(
+			        Requests,
+			        Requests[resolution_days] <> BLANK()
+			    ),
+			    Requests[resolution_days]
+			),
+			    SAMEPERIODLASTYEAR('Date'[full_date])
+			)
+			```
+		lineageTag: f1beb1d6-1193-42e8-ba61-49eb1cf4258a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Resolution Days(vs Last Year)' = ```
+			
+			VAR _curr = [Avg Resolution Days]
+			VAR _ly   = [Avg Resolution Days - LY]
+			VAR _perc = _curr - _ly
+			VAR _format =
+			SWITCH(
+			    TRUE(), 
+			    _perc >0, UNICHAR(11165) & " " & FORMAT(_perc, "0.00") & " Days",
+			    _perc <0, UNICHAR(11167) & " " & FORMAT(_perc*-1, "0.00") & " Days",
+			    FORMAT(_perc, "0.00") & " Days"
+			)
+			Return _format
+			```
+		lineageTag: 0bbb19fe-da67-41a8-a7cb-984cdab14897
+
+	measure 'Avg Resolution Days(vs Last Year - Color)' = ```
+			
+			VAR _curr = [Avg Resolution Days]
+			VAR _ly   = [Avg Resolution Days - LY]
+			VAR _perc = _curr - _ly
+			VAR _format =
+			SWITCH(
+			    TRUE(), 
+			    _perc >0, "Red",
+			    _perc <0, "Green",
+			    "Grey"
+			)
+			Return _format
+			```
+		lineageTag: 6a09bd15-2920-4d44-a808-04de5d4943e7
+
+	measure 'SLA Breach Text' =
+			
+			VAR _rate = [SLA Breach Rate %]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        _rate >= 0.20,   "Above 20% threshold",  -- Red  ≥20%
+			        _rate >= 0.10,   "Above 10% threshold",  -- Amber 10-20%
+			        "Below 10% threshold"                    -- Green <10%
+			    )
+		lineageTag: ab309ea0-c6d2-4d71-93e9-83a871df131f
+
+	measure 'Total Requests (vs Last Year - Num)' =
+			
+			VAR _curr = [Total Requests]
+			VAR _ly   = [Total Requests LY]
+			VAR _perc = DIVIDE(_curr - _ly,_ly)
+			Return _perc
+		lineageTag: 5e78b80b-57d2-40ef-9f07-9b79420a9b03
+
+	measure 'Total Requests LY' =
+			
+			CALCULATE(
+			    [Total Requests],
+			    SAMEPERIODLASTYEAR('Date'[full_date])
+			)
+		formatString: 0
+		lineageTag: f138a7bd-ea53-4c20-96f5-3aee1fc22c7c
+
+	measure 'Requests YoY % (Color)' = ```
+			
+			VAR _val = [Requests YoY %]
+			VAR _format =
+			SWITCH(
+			    TRUE(), 
+			    _val >0, "Red",
+			    _val <0, "Green",
+			    "Grey"
+			)
+			Return _format
+			```
+		lineageTag: 5bfaaa33-8408-405a-b11e-6b51f8806179
+
+	measure 'Avg Days Color' =
+			
+			VAR _val = [Avg Resolution Days]
+			RETURN
+			    SWITCH(TRUE(),
+			        ISBLANK(_val),   "#64748b",
+			        _val <= 3,       "#059669",   -- deep green
+			        _val <= 6,       "#10b981",   -- mid green
+			        _val <= 10,      "#6ee7b7",   -- light green
+			        _val <= 15,      "#fcd34d",   -- light yellow
+			        _val <= 20,      "#f59e0b",   -- amber
+			        _val <= 30,      "#f97316",   -- orange
+			                         "#ef4444"    -- red
+			    )
+		lineageTag: aa6cc6ac-1d9a-4c5e-8f88-5edda0427212
+
+	measure 'Vs Citywide Avg' = ```
+			
+			[Avg Resolution Days] - 
+			CALCULATE([Avg Resolution Days], ALL(Requests[borough]))
+			```
+		lineageTag: 23b70211-c205-42ca-bbc8-3502b14ba633
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Days Open' =
+			
+			CALCULATE(AVERAGE(Requests[days_open_if_pending]), Requests[status] <> "Closed")
+		lineageTag: f1f1e70b-03fe-469a-84c4-727b0be14a41
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Closed (Display)' =
+			
+			VAR Num = [Total Closed]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ABS(Num) >= 1000000, FORMAT(Num/1000000, "0.00") & "M",
+			    ABS(Num) >= 1000, FORMAT(Num/1000, "0.00") & "K",
+			    FORMAT(Num, "0.00")
+			)
+		lineageTag: 2ed18659-2f98-4670-b656-d6b405199284
+
+	measure 'Total Open (Display)' =
+			
+			VAR Num = [Total Open]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ABS(Num) >= 1000000, FORMAT(Num/1000000, "0.00") & "M",
+			    ABS(Num) >= 1000, FORMAT(Num/1000, "0.00") & "K",
+			    FORMAT(Num, "0.00")
+			)
+		lineageTag: 19bcaf09-4719-4782-ab94-60ba21e1843c
+
+	measure 'Oldest Open Case' =
+			
+			CALCULATE(MAX(Requests[days_open_if_pending]), Requests[status] <> "Closed")
+		formatString: 0
+		lineageTag: e3ef2764-4eb5-46c6-8b5d-804b9528d888
+
+	measure 'Avg Open Days (Display)' = FORMAT([Avg Days Open], "0.00") & " Days"
+		lineageTag: abc507fc-ef9c-4e33-b4b0-cb3bda71c412
+
+	measure 'Oldest Open Case (Display)' = FORMAT([Oldest Open Case], "0") & " Days"
+		lineageTag: 49e2f18e-a7ac-4391-8cc8-7cbb59167cc2
+
+	measure 'Within SLA Count' =
+			
+			CALCULATE(
+			    COUNTROWS(Requests),
+			    Requests[is_sla_breach] = 0
+			)
+		formatString: 0
+		lineageTag: f000c310-8234-4cf1-874c-19be75982955
+
+	measure 'Stale Over 90d' = CALCULATE(COUNTROWS(Requests), Requests[status] <> "Closed", Requests[days_open_if_pending] > 90)
+		formatString: 0
+		lineageTag: ec2cfa78-112d-4486-8dcf-d04be4b8d117
+
+	measure 'Stale Over 90d %' = DIVIDE([Stale Over 90d], [Total Open])
+		lineageTag: de3435ab-4d8d-432c-828f-b6b323a762af
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Open Trend Label' = "Open Cases — " & SELECTEDVALUE('Date'[year], "All Years")
+		lineageTag: 4c45f92b-dd8c-4cc4-87c1-868b5f8509c5
+
+	measure 'SLA Breached Count' =
+			
+			CALCULATE(
+			    COUNTROWS(Requests),
+			    Requests[is_sla_breach] = 1
+			)
+		formatString: 0
+		lineageTag: e29de121-d905-40bf-a841-6db12392faf7
+
+	measure 'SLA Breach Rate Open' =
+			
+			DIVIDE([SLA Breached Count], [Total Open])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6a9e17b7-e2f9-4124-bc7c-c8c5f866a0c5
+
+	measure 'Open Aging Bucket Color' =
+			
+			SWITCH(
+			    SELECTEDVALUE(Requests[Open Aging Bucket]),
+			    "0–30 days",    "#10b981",
+			    "31–90 days",   "#f59e0b",
+			    "91–180 days",  "#ef4444",
+			    "181–365 days", "#dc2626",
+			    "Over 365 days","#7f1d1d",
+			    "#64748b"
+			)
+		lineageTag: 5fdeedb3-ee1d-4772-b7be-2bbae2a2acf7
+
+	measure 'Oldest Case Created Date' =
+			
+			VAR _maxdays = MAXX(
+			    FILTER(Requests, Requests[status] <> "Closed"),
+			    Requests[days_open_if_pending]
+			)
+			RETURN
+			CALCULATE(
+			    MIN(Requests[created_date]),
+			    Requests[days_open_if_pending] = _maxdays
+			)
+		formatString: General Date
+		lineageTag: 9ee1c297-e583-49b7-be1e-85a4a7bbf84e
+
+	measure 'Oldest Case Department' =
+			
+			VAR _maxdays = MAXX(
+			    FILTER(Requests, Requests[status] <> "Closed"),
+			    Requests[days_open_if_pending]
+			)
+			RETURN
+			CALCULATE(
+			    FIRSTNONBLANK(Requests[agency_name], 1),
+			    Requests[days_open_if_pending] = _maxdays
+			)
+		lineageTag: 2eb33110-cb61-49b1-9135-fc450d6a2a5b
+
+	measure 'Oldest Case Complaint Type' =
+			
+			VAR _maxdays = MAXX(
+			    FILTER(Requests, Requests[status] <> "Closed"),
+			    Requests[days_open_if_pending]
+			)
+			RETURN
+			CALCULATE(
+			    FIRSTNONBLANK(Requests[complaint_type], 1),
+			    Requests[days_open_if_pending] = _maxdays
+			)
+		lineageTag: c222b2c2-b536-47ba-ade9-a859c1cd44c7
+
+	measure 'Oldest Case Summary' =
+			
+			VAR _maxdays = MAXX(
+			    FILTER(Requests, Requests[status] <> "Closed"),
+			    Requests[days_open_if_pending]
+			)
+			VAR _date = CALCULATE(
+			    MIN(Requests[created_date]),
+			    Requests[days_open_if_pending] = _maxdays
+			)
+			VAR _dept = CALCULATE(
+			    FIRSTNONBLANK(requests[agency_code], 1),
+			    Requests[days_open_if_pending] = _maxdays
+			)
+			VAR _type = CALCULATE(
+			    FIRSTNONBLANK(Requests[complaint_type], 1),
+			    Requests[days_open_if_pending] = _maxdays
+			)
+			RETURN
+			_dept  &
+			" | " & _type & " | " & FORMAT(_date, "MMM DD, YYYY")
+		lineageTag: d677272c-4af8-43eb-80a0-58033909298e
+
+	measure 'Avg Days Waiting vs SLA' =
+			
+			VAR _avg = [Avg Days Open]
+			VAR _sla = AVERAGE(Requests[sla_days])
+			RETURN
+			_avg - _sla
+		lineageTag: 55cc1803-ce58-48ec-9896-5388c1469f82
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Days Waiting vs SLA Label' = ```
+			
+			VAR _diff = [Avg Days Waiting vs SLA]
+			RETURN
+			IF(_diff > 0, 
+			    "+" & FORMAT(_diff, "0") & " days over SLA target",
+			    FORMAT(_diff, "0") & " days under SLA target"
+			)
+			```
+		lineageTag: 1a8a71d3-b50b-4e7f-bea5-a40bf826a5f8
+
+	measure 'Stale Cases 90 to 180' =
+			
+			CALCULATE(
+			    COUNTROWS(Requests),
+			    Requests[status] <> "Closed",
+			    Requests[days_open_if_pending] > 90,
+			    Requests[days_open_if_pending] <= 180
+			)
+		formatString: 0
+		lineageTag: bd0f3f5d-1e9b-45ea-9d0a-43b920e3d1d4
+
+	measure 'Stale Cases 180 to 365' =
+			
+			CALCULATE(
+			    COUNTROWS(Requests),
+			    Requests[status] <> "Closed",
+			    Requests[days_open_if_pending] > 180,
+			    Requests[days_open_if_pending] <= 365
+			)
+		formatString: 0
+		lineageTag: ee6e6973-7312-4adb-8083-3deac3e9bd6e
+
+	measure 'Stale Cases Over 365' =
+			
+			CALCULATE(
+			    COUNTROWS(Requests),
+			    Requests[status] <> "Closed",
+			    Requests[days_open_if_pending] > 365
+			)
+		formatString: 0
+		lineageTag: 70aef5e8-6b37-44ee-be6f-6328a4baae6a
+
+	measure 'Requests PY' =
+			
+			CALCULATE(
+			    [Total Requests],
+			    SAMEPERIODLASTYEAR('Date'[full_date])
+			)
+		formatString: 0
+		lineageTag: 4310343c-bfb7-460d-959d-cf7ac1d5c126
+
+	measure 'Sparkline Title' =
+			
+			FORMAT(MAX('Date'[Year]), "0")
+		lineageTag: 0660205c-6de9-416d-8bae-f0ffa0e5f0d3
+
+	measure 'MTD Daily Requests' =
+			
+			CALCULATE(
+			    [Total Requests],
+			    DATESMTD('Date'[full_date])
+			)
+		formatString: 0
+		lineageTag: 2ac4efae-a070-4834-ab20-86f4ec20a470
+
+	measure 'MTD Label' =
+			
+			FORMAT(EOMONTH(MAX('Date'[full_date]), -1) + 1, "MMM YYYY")
+		lineageTag: 3221ddba-ffd2-421a-a58a-347651b95a86
+
+	measure 'MTD Daily Requests PY' =
+			
+			CALCULATE(
+			    [MTD Daily Requests],
+			    SAMEPERIODLASTYEAR('Date'[full_date])
+			)
+		formatString: 0
+		lineageTag: 6d993eec-1dfc-4520-b9dc-544cc604d3f8
+
+	measure 'MTD Sparkline Title' =
+			
+			FORMAT(
+			    MAX('Date'[full_date]),
+			    "MMM YYYY"
+			)
+		lineageTag: c2a245cc-182e-473e-9e1e-d605ade5cc70
+
+	measure 'Is Last Month Filter' =
+			
+			IF(
+			    MAX('Date'[full_date]) >= EOMONTH(MAXX(ALL('Date'), 'Date'[full_date]), -1) + 1
+			    && MAX('Date'[full_date]) <= EOMONTH(MAXX(ALL('Date'), 'Date'[full_date]), 0),
+			    1, 0
+			)
+		formatString: 0
+		lineageTag: 9fcdb2d4-52b7-4b3d-85c2-f0a14a932cbd
+
+	measure 'Sparkline Bar Color' =
+			
+			IF(
+			    MAX('Date'[month]) = MONTH(MAXX(ALL('Date'), 'Date'[full_date])),
+			    "#0C447C",  -- dark navy for last month
+			    "#185FA5"   -- regular navy for all others
+			)
+		lineageTag: d7a8f23c-da8b-4bae-8e20-b7e245c54d7b
+
+	measure 'Avg Resolution Color' =
+			
+			SWITCH(
+			    TRUE(),
+			    [Avg Resolution Days] <= 15, "#9FE1CB",
+			    [Avg Resolution Days] <= 30, "#FAC775",
+			    "#F09595"
+			)
+		lineageTag: 16743edf-fb50-439a-aba7-565e757c7ed8
+
+	measure 'Total Requests (Display_!)' =
+			
+			VAR Num = [Total Requests]
+			RETURN
+			FORMAT(Num, "#,##0")
+		lineageTag: c9cf3d1f-3802-4882-94d1-1d8a4fd175f4
+
+	measure 'Borough SLA Color' =
+			
+			SWITCH(
+			    TRUE(),
+			    [SLA Breach Rate %] <= 0.10, "#9FE1CB",
+			    [SLA Breach Rate %] <= 0.20, "#FAC775",
+			    "#F09595"
+			)
+		lineageTag: 9fe58c05-7553-4a33-8fca-8598dd491c48
+
+	measure 'Borough Open Color' =
+			
+			SWITCH(
+			    TRUE(),
+			    [Total Open] <= 5000,  "#9FE1CB",
+			    [Total Open] <= 10000, "#FAC775",
+			    "#F09595"
+			)
+		lineageTag: fa28f2bf-f471-4020-b26c-8e3b2478a768
+
+	measure 'Agency Open Color' =
+			
+			SWITCH(
+			    TRUE(),
+			    [Total Open] >= 20000, "#F09595",
+			    [Total Open] >= 10000, "#FAC775",
+			    "#9FE1CB"
+			)
+		lineageTag: 940915b4-ba37-42d4-af78-f84f8fb365e7
+
+	column Placeholder
+		isHidden
+		formatString: 0
+		lineageTag: bf270c32-4f18-4484-a888-44f86423dba3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Placeholder]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("Placeholder", BLANK())
+
+	annotation PBI_Id = f49677faf63e4b7fb07b4d61c87c53f9
+
