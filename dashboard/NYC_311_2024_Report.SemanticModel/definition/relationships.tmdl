@@ -1,0 +1,9 @@
+relationship d241c538-68b8-41a2-a052-ad064398bf4e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: requests.closed_date
+	toColumn: LocalDateTable_f41e9ac8-df2e-4cd3-b56c-1a7b6da63976.Date
+
+relationship 67485032-4846-28b8-4a64-eae037fe17f5
+	fromColumn: requests.created_date
+	toColumn: Date.full_date
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "NYC_311_2024_Report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "29e35084-1133-45a6-8b10-5276752f567a"
+  }
+}

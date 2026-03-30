@@ -1,0 +1,83 @@
+table BoroughSummary
+	lineageTag: 7091d3ea-6ec9-4607-bd0d-33ce5643d017
+
+	column borough
+		dataType: string
+		lineageTag: 3e478703-5444-4d5c-a097-9ac4e7f38d99
+		summarizeBy: none
+		sourceColumn: borough
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: a74d61e3-6e3e-462e-9d33-e5797d98eb7c
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: aeb7df6f-187b-4aa7-a9dd-8d6c5f3cb229
+		summarizeBy: sum
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 87a2f673-0fd4-44c2-b334-0c87d32adb45
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_requests
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c53739c-2539-4bd9-95f5-2aef400aee52
+		summarizeBy: sum
+		sourceColumn: total_requests
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_closed
+		dataType: int64
+		formatString: 0
+		lineageTag: ad3f0cde-7da4-417f-92d3-b9373c6c503f
+		summarizeBy: sum
+		sourceColumn: total_closed
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_resolution_days
+		dataType: double
+		lineageTag: 62ef69ee-266a-4826-9d56-8507dfbce5fd
+		summarizeBy: sum
+		sourceColumn: avg_resolution_days
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column sla_breaches
+		dataType: int64
+		formatString: 0
+		lineageTag: 87ceb368-1efd-467b-9783-6f2de1ece30e
+		summarizeBy: sum
+		sourceColumn: sla_breaches
+
+		annotation SummarizationSetBy = Automatic
+
+	partition BoroughSummary = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("SURFACE", "NYC311_Analytics"),
+				    rpt_vw_borough_summary = Source{[Schema="rpt",Item="vw_borough_summary"]}[Data]
+				in
+				    rpt_vw_borough_summary
+

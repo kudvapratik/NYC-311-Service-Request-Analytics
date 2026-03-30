@@ -1,0 +1,357 @@
+table requests
+	lineageTag: 410eb6a3-42e9-47ae-8906-570af9cd8976
+
+	column request_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 195631a1-3e4b-440a-a632-0d467c234451
+		summarizeBy: sum
+		sourceColumn: request_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column unique_key
+		dataType: string
+		lineageTag: 3bd20b75-4730-446c-b1f0-ac0cde0a5bbc
+		summarizeBy: none
+		sourceColumn: unique_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: a6ca68d1-7034-4cb3-8ff3-48637f6bd57d
+		summarizeBy: none
+		sourceColumn: created_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column closed_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: bfb3b869-2c62-4977-a2bd-4f0bd13ffd21
+		summarizeBy: none
+		sourceColumn: closed_date
+
+		variation Variation
+			isDefault
+			relationship: d241c538-68b8-41a2-a052-ad064398bf4e
+			defaultHierarchy: LocalDateTable_f41e9ac8-df2e-4cd3-b56c-1a7b6da63976.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column status
+		dataType: string
+		lineageTag: c211e808-f4a2-4bd7-bbc4-fb8902aebb13
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column resolution_days
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e191d17-a40a-48b8-a4ed-1977d640f647
+		summarizeBy: sum
+		sourceColumn: resolution_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 7beb2ce2-3361-4e9e-b922-690215dc8c37
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter_name
+		dataType: string
+		lineageTag: 1e5fc52d-f563-4d6a-b3d5-b8f5cd2eac76
+		summarizeBy: none
+		sourceColumn: quarter_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: dabcfbc6-10d6-43d2-a444-53a3268cb1f4
+		summarizeBy: sum
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: f1b43df3-5939-470d-9785-4296419a3388
+		summarizeBy: none
+		sourceColumn: month_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_short
+		dataType: string
+		lineageTag: 774aede8-b1e9-4416-8d13-918316fdae04
+		summarizeBy: none
+		sourceColumn: month_short
+		sortByColumn: month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: f6c7ec2e-518c-4f97-b468-44e65de68955
+		summarizeBy: none
+		sourceColumn: day_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f72672e9-497b-46cd-b61a-d4035551d7aa
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_holiday
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 467f4626-15b6-415b-9649-a73487d0b33e
+		summarizeBy: none
+		sourceColumn: is_holiday
+
+		annotation SummarizationSetBy = Automatic
+
+	column agency_code
+		dataType: string
+		lineageTag: 45646b56-4b2e-48e8-8246-8c9f455cdd74
+		summarizeBy: none
+		sourceColumn: agency_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column agency_name
+		dataType: string
+		lineageTag: 65b600e4-eebd-4597-a288-007e7f4007b7
+		summarizeBy: none
+		sourceColumn: agency_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column department
+		dataType: string
+		lineageTag: 8a2a8135-4579-4058-a604-58a77e1d235a
+		summarizeBy: none
+		sourceColumn: department
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_days
+		dataType: int64
+		formatString: 0
+		lineageTag: c29080b5-6ea5-4339-8d9a-c32979d691bd
+		summarizeBy: sum
+		sourceColumn: sla_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column borough
+		dataType: string
+		lineageTag: 6c168d6f-212a-4628-8873-563b9d152c45
+		summarizeBy: none
+		sourceColumn: borough
+
+		annotation SummarizationSetBy = Automatic
+
+	column community_board
+		dataType: string
+		lineageTag: 1094f099-fc9d-46bd-82c5-8f2de8e70ddf
+		summarizeBy: none
+		sourceColumn: community_board
+
+		annotation SummarizationSetBy = Automatic
+
+	column zip_code
+		dataType: string
+		lineageTag: fce8f297-8e43-4d30-951b-f4cbf99608a2
+		dataCategory: PostalCode
+		summarizeBy: none
+		sourceColumn: zip_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column latitude
+		dataType: double
+		lineageTag: e9d37c59-987e-4de0-8ce2-2c9c53474655
+		summarizeBy: sum
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		lineageTag: 6da48f3c-ae58-411b-829a-ace108d72028
+		summarizeBy: sum
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column neighborhood
+		dataType: string
+		lineageTag: 2b28ce44-0e6a-4ce9-bbb0-9a5f77d2f291
+		summarizeBy: none
+		sourceColumn: neighborhood
+
+		annotation SummarizationSetBy = Automatic
+
+	column complaint_type
+		dataType: string
+		lineageTag: ea0b73a2-345a-4e06-8b22-960c70685923
+		summarizeBy: none
+		sourceColumn: complaint_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column descriptor
+		dataType: string
+		lineageTag: 8977db4e-3786-45da-889f-907096e849f5
+		summarizeBy: none
+		sourceColumn: descriptor
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 7030747a-2da7-44b7-bbd9-9ca523985f9d
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_sla_breach
+		dataType: int64
+		formatString: 0
+		lineageTag: fcb00901-38e3-41c4-9eb7-56a8899ca5e9
+		summarizeBy: sum
+		sourceColumn: is_sla_breach
+
+		annotation SummarizationSetBy = Automatic
+
+	column days_open_if_pending
+		dataType: int64
+		formatString: 0
+		lineageTag: 3af6dec2-f774-4846-a34b-ae2c6cbc69c4
+		summarizeBy: sum
+		sourceColumn: days_open_if_pending
+
+		annotation SummarizationSetBy = Automatic
+
+	column resolution_bucket
+		dataType: string
+		lineageTag: c15798c1-8c22-4f17-87c1-b6042187a3ef
+		summarizeBy: none
+		sourceColumn: resolution_bucket
+		sortByColumn: resolution_bucket_sort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'resolution bucket Sort Order' =
+			
+			SWITCH(
+			    'requests'[resolution_bucket],
+			    "Same Day",    1,
+			    "1-3 Days",    2,
+			    "4-7 Days",    3,
+			    "8-30 Days",   4,
+			    "Over 30 Days", 5,
+			    "Open",        6,
+			    99
+			)
+		formatString: 0
+		lineageTag: 3ee9204c-44be-42fb-927a-5d2261ee313f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Breach Label' = IF(Requests[is_sla_breach] = 1, "SLA Breached", "Within SLA")
+		lineageTag: 3466f5fc-b05f-4905-836a-3bb2f1caa4c1
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Open Aging Bucket' =
+			
+			SWITCH(TRUE(),
+			    Requests[days_open_if_pending] <= 30,  "0–30 days",
+			    Requests[days_open_if_pending] <= 90,  "31–90 days",
+			    Requests[days_open_if_pending] <= 180, "91–180 days",
+			    Requests[days_open_if_pending] <= 365, "181–365 days",
+			    Requests[days_open_if_pending] > 365,  "Over 365 days",
+			    "N/A"
+			)
+		lineageTag: 5ac2c800-d4da-4c06-a406-b015314c61f8
+		summarizeBy: none
+		sortByColumn: 'Open Aging Sort'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Open Aging Sort' =
+			
+			SWITCH(TRUE(),
+			    Requests[days_open_if_pending] <= 30,  1,
+			    Requests[days_open_if_pending] <= 90,  2,
+			    Requests[days_open_if_pending] <= 180, 3,
+			    Requests[days_open_if_pending] <= 365, 4,
+			    Requests[days_open_if_pending] > 365,  5,
+			    6
+			)
+		formatString: 0
+		lineageTag: 249a45f5-12c9-42a4-b387-8d1174bc6808
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column resolution_bucket_sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 9e465c4d-49a1-4bb2-be74-d3926d18dc44
+		summarizeBy: sum
+		sourceColumn: resolution_bucket_sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition requests = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("SURFACE", "NYC311_Analytics"),
+				    rpt_vw_service_requests = Source{[Schema="rpt",Item="vw_service_requests"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(rpt_vw_service_requests,{{"created_date", type date}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

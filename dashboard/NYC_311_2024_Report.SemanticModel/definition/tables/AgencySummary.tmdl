@@ -1,0 +1,139 @@
+table AgencySummary
+	lineageTag: d202599d-2f53-49c5-b178-0d77a8931ece
+
+	column agency_code
+		dataType: string
+		lineageTag: af553c09-16b4-4e00-a37c-bd743f9bc1ee
+		summarizeBy: none
+		sourceColumn: agency_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column agency_name
+		dataType: string
+		lineageTag: 5487186f-7bb5-4730-8863-1027ec3f353b
+		summarizeBy: none
+		sourceColumn: agency_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Agency
+		dataType: string
+		lineageTag: e7ed0c0b-7014-45d3-a24b-5293183d1872
+		summarizeBy: none
+		sourceColumn: Agency
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_days
+		dataType: int64
+		formatString: 0
+		lineageTag: 852cff59-891d-455d-85d4-a1cfec5f5d03
+		summarizeBy: sum
+		sourceColumn: sla_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: eaa12174-7d25-4d86-87de-df3167b44ed6
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: cbea5ce9-e504-4762-8936-4bc9f6d0bb9d
+		summarizeBy: sum
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: 11ecb33b-ed24-48b6-aa29-375efc1efaeb
+		summarizeBy: none
+		sourceColumn: month_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_requests
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9af9d0ca-a238-4787-a42d-1f7438dbd317
+		summarizeBy: sum
+		sourceColumn: total_requests
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_closed
+		dataType: int64
+		formatString: 0
+		lineageTag: f67d966c-bade-42e5-85c6-8df093f674b2
+		summarizeBy: sum
+		sourceColumn: total_closed
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_open
+		dataType: int64
+		formatString: 0
+		lineageTag: 3e168738-2c1c-4d76-ae70-0adeb3d8a9d7
+		summarizeBy: sum
+		sourceColumn: total_open
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_resolution_days
+		dataType: double
+		lineageTag: 295420bd-82ee-4bb7-92ea-9dd9e6764572
+		summarizeBy: sum
+		sourceColumn: avg_resolution_days
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column max_resolution_days
+		dataType: int64
+		formatString: 0
+		lineageTag: 70a3b258-09c4-4602-a590-55cf4260a874
+		summarizeBy: sum
+		sourceColumn: max_resolution_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_breaches
+		dataType: int64
+		formatString: 0
+		lineageTag: 17327bd8-5051-4a0d-8827-d3f0be9d0803
+		summarizeBy: sum
+		sourceColumn: sla_breaches
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_breach_pct
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 1a878550-4c11-40ac-878d-89b3b39729b3
+		summarizeBy: sum
+		sourceColumn: sla_breach_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition AgencySummary = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("SURFACE", "NYC311_Analytics"),
+				    rpt_vw_agency_summary = Source{[Schema="rpt",Item="vw_agency_summary"]}[Data]
+				in
+				    rpt_vw_agency_summary
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

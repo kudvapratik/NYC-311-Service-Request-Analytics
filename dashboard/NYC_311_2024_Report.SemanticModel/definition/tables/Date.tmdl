@@ -1,0 +1,182 @@
+table Date
+	lineageTag: a1c1e3a2-f48e-409a-b8f5-0ec78c89b5d1
+	dataCategory: Time
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c80106c-7ffa-4538-ba25-c38b1878067c
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column full_date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 96a4c53b-8fca-417f-8afa-89c55ca6e596
+		summarizeBy: none
+		sourceColumn: full_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: b3bc4efe-4d9e-47b9-bb56-43c64f208fbc
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 88c19b3e-4fee-4295-8618-23521ed134bf
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter_name
+		dataType: string
+		lineageTag: 5adbbc9a-fcac-4cf3-888f-dcfa1e8a81d8
+		summarizeBy: none
+		sourceColumn: quarter_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: 613519f8-2459-4aa6-ada8-f058b47d8f58
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: a7bd9ff1-7b46-4d95-ac57-a3c65f873f52
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_short
+		dataType: string
+		lineageTag: 4ba61405-b2d6-4170-8854-0ba3f0f2c4b8
+		summarizeBy: none
+		sourceColumn: month_short
+		sortByColumn: month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_of_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 88fd9aaf-417b-4168-afe1-f455fc06c555
+		summarizeBy: none
+		sourceColumn: week_of_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_month
+		dataType: int64
+		formatString: 0
+		lineageTag: 2015fe62-8421-47ef-a745-0d626d4000fd
+		summarizeBy: none
+		sourceColumn: day_of_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week
+		dataType: int64
+		formatString: 0
+		lineageTag: b2bb6a92-cd22-4588-9c5a-d47e14c3d67b
+		summarizeBy: none
+		sourceColumn: day_of_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: 4050e647-5571-457e-919c-e8d375369a1d
+		summarizeBy: none
+		sourceColumn: day_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 62db006d-ff3f-4f04-85d1-39af48c14476
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_holiday
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c7932eff-e56c-4685-9da5-5f0890c3874a
+		summarizeBy: none
+		sourceColumn: is_holiday
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month' = FORMAT('Date'[full_date], "YYYY-MM")
+		lineageTag: f4333c7d-e04c-4d7c-bfd6-753bbad5faa2
+		summarizeBy: none
+		sortByColumn: 'Year Month Sort'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month Sort' =
+			
+			'Date'[year] * 100 + 'Date'[month]
+		formatString: 0
+		lineageTag: 1d8b13df-bdb6-4601-adac-d4caf21f6c09
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Last Month' =
+			
+			IF(
+			    MONTH('Date'[full_date]) = MONTH(MAX('Date'[full_date]))
+			    && YEAR('Date'[full_date]) = YEAR(MAX('Date'[full_date])),
+			    1, 0
+			)
+		formatString: 0
+		lineageTag: 7221b6ce-2baa-4324-b2f8-d03cee017b06
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("SURFACE", "NYC311_Analytics"),
+				    dw_dim_date = Source{[Schema="dw",Item="dim_date"]}[Data],
+				    #"Filtered Rows" = Table.SelectRows(dw_dim_date, each [year] >= 2023 and [year] <= 2025)
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

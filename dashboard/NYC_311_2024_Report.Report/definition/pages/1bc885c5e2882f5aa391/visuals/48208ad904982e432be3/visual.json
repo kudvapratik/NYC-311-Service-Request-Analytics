@@ -1,0 +1,91 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "48208ad904982e432be3",
+  "position": {
+    "x": 340,
+    "y": 632.22222222222217,
+    "z": 6001,
+    "height": 34.444444444444443,
+    "width": 300,
+    "tabOrder": 5001
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "●",
+                    "textStyle": {
+                      "color": "#9fe3cd"
+                    }
+                  },
+                  {
+                    "value": " "
+                  },
+                  {
+                    "value": "≤ 15 days",
+                    "textStyle": {
+                      "color": "#9fe3cd"
+                    }
+                  },
+                  {
+                    "value": " "
+                  },
+                  {
+                    "value": "● 16–30 days",
+                    "textStyle": {
+                      "color": "#fbd89d"
+                    }
+                  },
+                  {
+                    "value": " "
+                  },
+                  {
+                    "value": "● > 30 days",
+                    "textStyle": {
+                      "color": "#f9b4b4"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

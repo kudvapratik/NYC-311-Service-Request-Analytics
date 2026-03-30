@@ -1,0 +1,5 @@
+role UnrestrictedRole
+	modelPermission: read
+
+	annotation PBI_Id = 57a91e54f33c4145b521565e0c2bf089
+

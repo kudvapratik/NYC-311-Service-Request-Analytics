@@ -1,0 +1,86 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 43.81019865552571,
+        "y": 43
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 43.81019865552571,
+            "y": 441.09258861889009
+          },
+          "nodeIndex": "_Measures",
+          "nodeLineageTag": "d3c088d1-e022-457d-acb3-1159b27c7d88",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 1125.8101986555257,
+            "y": 459.61184284582214
+          },
+          "nodeIndex": "requests",
+          "nodeLineageTag": "410eb6a3-42e9-47ae-8906-570af9cd8976",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 1437.8101986555257,
+            "y": 275.61184284582214
+          },
+          "nodeIndex": "BoroughSummary",
+          "nodeLineageTag": "7091d3ea-6ec9-4607-bd0d-33ce5643d017",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 634.61741144613461,
+            "y": 126.28354242207297
+          },
+          "nodeIndex": "Date",
+          "nodeLineageTag": "a1c1e3a2-f48e-409a-b8f5-0ec78c89b5d1",
+          "size": {
+            "height": 438,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 1906,
+            "y": 208.75866435256557
+          },
+          "nodeIndex": "AgencySummary",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}
