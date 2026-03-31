@@ -3,7 +3,7 @@
 # Features:
 #   - Year range input (e.g. 2022 to 2024)
 #   - Auto-save checkpoint every N pages
-#   - Resume from failed page
+#   - Resume from failed page — full year range preserved
 #   - One CSV per year
 # Author  : Pratik Kudva
 # Dataset : NYC Open Data erm2-nwe9
@@ -50,15 +50,18 @@ COLUMNS = [
     "status", "resolution_description", "community_board",
 ]
 
+
 # ── CHECKPOINT HELPERS ────────────────────────────────────────
-def save_checkpoint(year: int, page: int, offset: int,
-                    rows_saved: int) -> None:
+def save_checkpoint(year: int, year_end: int, page: int,
+                    offset: int, rows_saved: int) -> None:
     """
     Save progress to JSON file.
-    If download fails — resume from here next run.
+    Stores the full original year_end so resume can continue
+    downloading remaining years after the crashed one.
     """
     checkpoint = {
         "year":       year,
+        "year_end":   year_end,   # FIX 2 — preserve full range for resume
         "page":       page,
         "offset":     offset,
         "rows_saved": rows_saved,
@@ -139,7 +142,7 @@ def fetch_page(year: int, offset: int, limit: int) -> list:
         response.raise_for_status()
         return response.json()
     except requests.exceptions.Timeout:
-        log.error("Request timed out — API slow. Save checkpoint and retry.")
+        log.error("Request timed out — API slow. Re-run to resume from checkpoint.")
         raise
     except requests.exceptions.HTTPError as e:
         log.error(f"HTTP error: {e}")
@@ -150,7 +153,10 @@ def fetch_page(year: int, offset: int, limit: int) -> list:
 
 
 def clean_row(row: dict) -> dict:
-    """Light cleaning — strip whitespace. Heavy cleaning in SQL ETL."""
+    """
+    Light cleaning — strip whitespace. Heavy cleaning in SQL ETL.
+    Missing fields return empty string (converted to NULL in staging).
+    """
     return {
         col: row.get(col, "").strip()
         if isinstance(row.get(col, ""), str)
@@ -160,7 +166,7 @@ def clean_row(row: dict) -> dict:
 
 
 # ── DOWNLOAD ONE YEAR ─────────────────────────────────────────
-def download_year(year: int,
+def download_year(year: int, year_end: int,
                   resume_page: int = 1,
                   resume_offset: int = 0,
                   resume_rows: int = 0) -> int:
@@ -169,14 +175,16 @@ def download_year(year: int,
     Saves CSV every SAVE_EVERY pages.
     Returns total rows downloaded.
 
+    year_end    : original end year of the run — stored in checkpoint
+                  so resume knows which years still need downloading
     resume_page/offset/rows: used when resuming after failure
     """
-    csv_path    = get_csv_path(year)
-    page        = resume_page
-    offset      = resume_offset
-    total_rows  = resume_rows
-    batch_rows  = []           # accumulate rows between saves
-    write_header = not os.path.exists(csv_path)  # header if new file
+    csv_path     = get_csv_path(year)
+    page         = resume_page
+    offset       = resume_offset
+    total_rows   = resume_rows
+    batch_rows   = []           # accumulate rows between saves
+    write_header = not os.path.exists(csv_path)  # header only if new file
 
     log.info("-" * 52)
     log.info(f"Year {year} — starting from page {page} "
@@ -190,14 +198,17 @@ def download_year(year: int,
         try:
             raw_batch = fetch_page(year, offset, PAGE_SIZE)
         except Exception as e:
-            # Save whatever we have before crashing
+            # FIX 3 — do NOT add len(batch_rows) to total_rows here;
+            # those rows were already counted when added to batch_rows
+            # FIX 4 — reset write_header after writing so header is
+            # never written twice if execution somehow continues
             if batch_rows:
                 append_to_csv(batch_rows, year, write_header)
-                total_rows += len(batch_rows)
-                write_header = False
-            save_checkpoint(year, page, offset, total_rows)
+                write_header = False   # FIX 4
+            save_checkpoint(year, year_end, page, offset, total_rows)
+            # FIX 5 — removed reference to non-existent --resume flag
             log.error(f"Download failed on page {page}. "
-                      f"Resume with --resume flag.")
+                      f"Re-run the script — checkpoint saved, will prompt to resume.")
             raise
 
         # Empty page = no more data for this year
@@ -208,7 +219,7 @@ def download_year(year: int,
         # Clean rows lightly
         cleaned = [clean_row(row) for row in raw_batch]
         batch_rows.extend(cleaned)
-        total_rows += len(cleaned)
+        total_rows += len(cleaned)   # counted here — not again on error
         offset     += PAGE_SIZE
 
         log.info(f"Year {year} | Page {page:>4} | "
@@ -219,7 +230,7 @@ def download_year(year: int,
         if page % SAVE_EVERY == 0:
             append_to_csv(batch_rows, year, write_header)
             write_header = False
-            save_checkpoint(year, page + 1, offset, total_rows)
+            save_checkpoint(year, year_end, page + 1, offset, total_rows)
             batch_rows = []  # clear buffer after saving
 
         # Partial page = last page of year
@@ -244,6 +255,9 @@ def download_year(year: int,
 # ── USER INPUT ────────────────────────────────────────────────
 def get_year_range() -> tuple[int, int]:
     """Ask user for start and end year."""
+    # FIX 1 — dynamic upper bound, not hardcoded 2025
+    current_year = datetime.now().year
+
     print("\n" + "=" * 52)
     print("NYC 311 Data Downloader v2.0")
     print("=" * 52)
@@ -252,10 +266,10 @@ def get_year_range() -> tuple[int, int]:
         try:
             start = int(input("Enter start year (e.g. 2022): ").strip())
             end   = int(input("Enter end year   (e.g. 2024): ").strip())
-            if 2010 <= start <= end <= 2025:
+            if 2010 <= start <= end <= current_year:
                 return start, end
-            print("Years must be between 2010 and 2025, "
-                  "start <= end.")
+            print(f"Years must be between 2010 and {current_year}, "
+                  f"start <= end.")
         except ValueError:
             print("Please enter valid years e.g. 2022")
 
@@ -269,9 +283,12 @@ def check_resume() -> dict | None:
     if not cp:
         return None
 
+    # FIX 2 — show year_end from checkpoint so user knows full range
+    year_end = cp.get("year_end", cp["year"])
+
     print(f"\nCheckpoint found!")
-    print(f"  Year      : {cp['year']}")
-    print(f"  Page      : {cp['page']}")
+    print(f"  Year      : {cp['year']} (resuming from page {cp['page']})")
+    print(f"  Year end  : {year_end}")
     print(f"  Rows saved: {cp['rows_saved']:,}")
     print(f"  Saved at  : {cp['saved_at']}")
 
@@ -293,11 +310,12 @@ def main():
     checkpoint = check_resume()
 
     if checkpoint:
-        # Resume single year from checkpoint
+        # FIX 2 — resume from crashed year through original year_end
+        # so remaining years are not silently dropped
         year_start = checkpoint["year"]
-        year_end   = checkpoint["year"]
+        year_end   = checkpoint.get("year_end", checkpoint["year"])
         log.info(f"Resuming year {year_start} from page "
-                 f"{checkpoint['page']}")
+                 f"{checkpoint['page']} — will continue to {year_end}")
     else:
         # Fresh start — get year range from user
         year_start, year_end = get_year_range()
@@ -317,6 +335,7 @@ def main():
                 # Resume this year from checkpoint
                 rows = download_year(
                     year,
+                    year_end      = year_end,
                     resume_page   = checkpoint["page"],
                     resume_offset = checkpoint["offset"],
                     resume_rows   = checkpoint["rows_saved"],
@@ -324,14 +343,14 @@ def main():
                 checkpoint = None  # clear after first resumed year
             else:
                 # Fresh download for this year
-                rows = download_year(year)
+                rows = download_year(year, year_end=year_end)
 
             totals[year] = rows
 
         except Exception as e:
             log.error(f"Year {year} failed: {e}")
             log.error("Fix the issue and re-run — "
-                      "checkpoint saved, will resume.")
+                      "checkpoint saved, will prompt to resume.")
             break
 
     # Final summary

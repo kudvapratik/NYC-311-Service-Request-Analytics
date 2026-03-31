@@ -9,19 +9,19 @@ An end-to-end analytics pipeline on New York City's public 311 dataset — 3.4 m
 ## 📊 Dashboard Preview
 
 ### Executive Summary
-![Executive Summary](screenshots/Executive_Summary.png)
+![Executive Summary](Screenshots/Executive_Summary.png)
 
 ### Agency Summary
-![Agency Summary](screenshots/Agency_Summary.png)
+![Agency Summary](Screenshots/Agency_Summary.png)
 
 ### Borough Map
-![Borough Map](screenshots/Borough_Map.png)
+![Borough Map](Screenshots/Borough_Map.png)
 
 ### Complaint Analysis
-![Complaint Analysis](screenshots/Complaint_Analysis.png)
+![Complaint Analysis](Screenshots/Complaint_Analysis.png)
 
 ### Open Cases
-![Open Cases](screenshots/Open_Requests.png)
+![Open Cases](Screenshots/Open_Requests.png)
 
 ---
 
