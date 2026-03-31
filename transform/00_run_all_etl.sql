@@ -42,11 +42,11 @@ GO
 :r 04_load_dim_complaint_type.sql
 GO
 
--- Step 5 — fact table via stored procedure
---EXEC dw.usp_load_fact_service_requests
---    @batch_id   = NULL,  -- defaults to today
---    @debug_mode = 0;
---GO
+ Step 5 — fact table via stored procedure
+EXEC dw.usp_load_fact_service_requests
+    @batch_id   = NULL,  -- defaults to today
+    @debug_mode = 0;
+GO
 
 -- ── LOAD SUMMARY ─────────────────────────────────────────────
 PRINT '============================================================';
